@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mood Music Player</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #121212;
+            color: #ffffff;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 50px 20px;
+            margin: 0;
+        }
+        h1 {
+            margin-bottom: 10px;
+        }
+        p {
+            color: #a0a0a0;
+            margin-bottom: 30px;
+        }
+        .mood-buttons {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        button {
+            padding: 15px 30px;
+            font-size: 16px;
+            font-weight: bold;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: transform 0.2s, opacity 0.2s;
+        }
+        button:hover {
+            transform: scale(1.05);
+            opacity: 0.9;
+        }
+        #btn-happy { background-color: #FFD700; color: #000; }
+        #btn-sad { background-color: #4682B4; color: #fff; }
+        #btn-party { background-color: #FF4500; color: #fff; }
+        #btn-chill { background-color: #8A2BE2; color: #fff; }
+
+        .player-container {
+            background-color: #1e1e1e;
+            padding: 30px;
+            border-radius: 15px;
+            width: 100%;
+            max-width: 400px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+        #now-playing {
+            font-size: 18px;
+            margin-bottom: 20px;
+            font-weight: bold;
+            color: #1DB954;
+        }
+        audio {
+            width: 100%;
+            outline: none;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Mood Music Player</h1>
+    <p>Select your mood to play a random track.</p>
+
+    <div class="mood-buttons">
+        <button id="btn-happy" onclick="playMood('happy')">Happy</button>
+        <button id="btn-sad" onclick="playMood('sad')">Sad</button>
+        <button id="btn-party" onclick="playMood('party')">Party</button>
+        <button id="btn-chill" onclick="playMood('chill')">Chill</button>
+    </div>
+
+    <div class="player-container">
+        <div id="now-playing">Waiting for you to pick a mood...</div>
+        <audio id="audio-player" controls>
+            Your browser does not support the audio element.
+        </audio>
+    </div>
+
+    <script>
+        // =====================================================================
+        // 🛑 IMPORTANT: REPLACE THE FILE NAMES BELOW WITH YOUR ACTUAL SONG NAMES
+        // Make sure the names match exactly, including the ".mp3" at the end.
+        // You can copy and paste lines to add all 30 songs per mood.
+        // =====================================================================
+
+        const playlists = {
+            happy: [
+                "Bairan.mp3",
+                "happy_song_2.mp3",
+                "happy_song_3.mp3" // Add commas after each one except the last!
+            ],
+            sad: [
+                "sad_song_1.mp3",
+                "sad_song_2.mp3",
+                "sad_song_3.mp3"
+            ],
+            party: [
+                "party_song_1.mp3",
+                "party_song_2.mp3",
+                "party_song_3.mp3"
+            ],
+            chill: [
+                "chill_song_1.mp3",
+                "chill_song_2.mp3",
+                "chill_song_3.mp3"
+            ]
+        };
+
+        // =====================================================================
+        // DO NOT TOUCH THE CODE BELOW THIS LINE
+        // =====================================================================
+
+        const audioPlayer = document.getElementById('audio-player');
+        const nowPlayingText = document.getElementById('now-playing');
+
+        function playMood(mood) {
+            const songs = playlists[mood];
+            
+            if (songs.length === 0 || songs[0] === "") {
+                nowPlayingText.innerText = "No songs added for this mood yet!";
+                return;
+            }
+
+            // Pick a random song from the chosen mood array
+            const randomIndex = Math.floor(Math.random() * songs.length);
+            const selectedSong = songs[randomIndex];
+
+            // Update the player and text
+            audioPlayer.src = selectedSong;
+            nowPlayingText.innerText = `Playing: ${selectedSong.replace('.mp3', '')}`;
+            
+            // Play the song
+            audioPlayer.play();
+        }
+    </script>
+
+</body>
+</html>
