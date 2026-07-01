@@ -5,83 +5,178 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mood Music Player</title>
     <style>
+        :root {
+            --bg: #0a0a0a;
+            --surface: rgba(255, 255, 255, 0.05);
+            --border: rgba(255, 255, 255, 0.1);
+            --text-main: #ffffff;
+            --text-muted: #888888;
+        }
+
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #121212;
-            color: #ffffff;
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            background-color: var(--bg);
+            color: var(--text-main);
+            margin: 0;
+            padding: 0;
             display: flex;
             flex-direction: column;
             align-items: center;
-            padding: 50px 20px;
-            margin: 0;
+            min-height: 100vh;
+            padding-bottom: 120px; /* Space for the bottom player */
         }
-        h1 {
-            margin-bottom: 10px;
+
+        /* Header */
+        .header {
+            text-align: center;
+            margin: 50px 20px 30px;
         }
-        p {
-            color: #a0a0a0;
-            margin-bottom: 30px;
+        .header h1 {
+            font-size: 2.5rem;
+            font-weight: 300;
+            letter-spacing: 2px;
+            margin: 0 0 10px 0;
         }
-        .mood-buttons {
+        .header p {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            letter-spacing: 1px;
+        }
+
+        /* Mood Selection */
+        .mood-container {
             display: flex;
             gap: 15px;
-            margin-bottom: 30px;
             flex-wrap: wrap;
             justify-content: center;
+            margin-bottom: 40px;
+            max-width: 800px;
         }
-        button {
-            padding: 15px 30px;
-            font-size: 16px;
-            font-weight: bold;
-            border: none;
-            border-radius: 50px;
+        
+        .mood-btn {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            color: var(--text-main);
+            padding: 12px 30px;
+            font-size: 1rem;
+            letter-spacing: 1px;
+            border-radius: 30px;
             cursor: pointer;
-            transition: transform 0.2s, opacity 0.2s;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
         }
-        button:hover {
-            transform: scale(1.05);
-            opacity: 0.9;
+        .mood-btn:hover, .mood-btn.active {
+            background: rgba(255, 255, 255, 0.15);
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
         }
-        #btn-happy { background-color: #FFD700; color: #000; }
-        #btn-sad { background-color: #4682B4; color: #fff; }
-        #btn-party { background-color: #FF4500; color: #fff; }
-        #btn-chill { background-color: #8A2BE2; color: #fff; }
 
-        .player-container {
-            background-color: #1e1e1e;
-            padding: 30px;
-            border-radius: 15px;
+        /* Playlist Section */
+        .playlist-section {
             width: 100%;
-            max-width: 400px;
-            text-align: center;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            max-width: 600px;
+            padding: 0 20px;
+            box-sizing: border-box;
+        }
+        .playlist-title {
+            font-size: 1.2rem;
+            margin-bottom: 20px;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 10px;
+            text-transform: capitalize;
+            display: none;
+        }
+        .song-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        .song-item {
+            padding: 15px 20px;
+            margin-bottom: 10px;
+            background: var(--surface);
+            border: 1px solid transparent;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+        }
+        .song-item:hover {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: var(--border);
+        }
+        .song-item.playing {
+            border-left: 4px solid #ffffff;
+            background: rgba(255, 255, 255, 0.1);
+        }
+        .song-icon {
+            margin-right: 15px;
+            opacity: 0.5;
+        }
+
+        /* Fixed Bottom Player */
+        .player-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background: rgba(10, 10, 10, 0.85);
+            backdrop-filter: blur(15px);
+            border-top: 1px solid var(--border);
+            padding: 20px;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            z-index: 100;
         }
         #now-playing {
-            font-size: 18px;
-            margin-bottom: 20px;
-            font-weight: bold;
-            color: #1DB954;
+            font-size: 0.9rem;
+            color: var(--text-main);
+            margin-bottom: 15px;
+            letter-spacing: 1px;
         }
         audio {
             width: 100%;
+            max-width: 600px;
+            height: 40px;
             outline: none;
+        }
+        
+        /* Customizing the default audio player slightly */
+        audio::-webkit-media-controls-panel {
+            background-color: var(--surface);
+        }
+        audio::-webkit-media-controls-current-time-display,
+        audio::-webkit-media-controls-time-remaining-display {
+            color: var(--text-main);
         }
     </style>
 </head>
 <body>
 
-    <h1>Mood Music Player</h1>
-    <p>Select your mood to play a random track.</p>
-
-    <div class="mood-buttons">
-        <button id="btn-happy" onclick="playMood('happy')">Happy</button>
-        <button id="btn-sad" onclick="playMood('sad')">Sad</button>
-        <button id="btn-party" onclick="playMood('party')">Party</button>
-        <button id="btn-chill" onclick="playMood('chill')">Chill</button>
+    <div class="header">
+        <h1>MOOD</h1>
+        <p>SELECT YOUR VIBE. CHOOSE YOUR TRACK.</p>
     </div>
 
-    <div class="player-container">
-        <div id="now-playing">Waiting for you to pick a mood...</div>
+    <div class="mood-container">
+        <button class="mood-btn" onclick="loadPlaylist('happy', this)">Happy</button>
+        <button class="mood-btn" onclick="loadPlaylist('sad', this)">Sad</button>
+        <button class="mood-btn" onclick="loadPlaylist('party', this)">Party</button>
+        <button class="mood-btn" onclick="loadPlaylist('chill', this)">Chill</button>
+    </div>
+
+    <div class="playlist-section">
+        <div class="playlist-title" id="playlist-title">Select a mood to view tracks</div>
+        <ul class="song-list" id="song-list">
+            <!-- Songs will appear here manually -->
+        </ul>
+    </div>
+
+    <div class="player-bar">
+        <div id="now-playing">Not Playing</div>
         <audio id="audio-player" controls>
             Your browser does not support the audio element.
         </audio>
@@ -89,16 +184,15 @@
 
     <script>
         // =====================================================================
-        // 🛑 IMPORTANT: REPLACE THE FILE NAMES BELOW WITH YOUR ACTUAL SONG NAMES
-        // Make sure the names match exactly, including the ".mp3" at the end.
-        // You can copy and paste lines to add all 30 songs per mood.
+        // 🛑 ADD YOUR 30 SONGS PER MOOD HERE
+        // Keep the quotes. Separate with commas. Don't put a comma on the last one.
         // =====================================================================
 
         const playlists = {
             happy: [
                 "Bairan.mp3",
                 "happy_song_2.mp3",
-                "happy_song_3.mp3" // Add commas after each one except the last!
+                "happy_song_3.mp3"
             ],
             sad: [
                 "sad_song_1.mp3",
@@ -118,29 +212,66 @@
         };
 
         // =====================================================================
-        // DO NOT TOUCH THE CODE BELOW THIS LINE
+        // LOGIC FOR MANUAL SELECTION & UI (DO NOT TOUCH)
         // =====================================================================
 
         const audioPlayer = document.getElementById('audio-player');
         const nowPlayingText = document.getElementById('now-playing');
+        const songListContainer = document.getElementById('song-list');
+        const playlistTitle = document.getElementById('playlist-title');
+        let currentPlayingItem = null;
 
-        function playMood(mood) {
-            const songs = playlists[mood];
+        function loadPlaylist(mood, buttonElement) {
+            // Update active button styling
+            document.querySelectorAll('.mood-btn').forEach(btn => btn.classList.remove('active'));
+            buttonElement.classList.add('active');
+
+            // Show title
+            playlistTitle.style.display = 'block';
+            playlistTitle.innerText = `${mood.toUpperCase()} VIBES`;
+
+            // Clear current list
+            songListContainer.innerHTML = '';
             
+            const songs = playlists[mood];
+
             if (songs.length === 0 || songs[0] === "") {
-                nowPlayingText.innerText = "No songs added for this mood yet!";
+                songListContainer.innerHTML = '<li class="song-item">No tracks uploaded yet.</li>';
                 return;
             }
 
-            // Pick a random song from the chosen mood array
-            const randomIndex = Math.floor(Math.random() * songs.length);
-            const selectedSong = songs[randomIndex];
+            // Generate list items manually
+            songs.forEach((songFile) => {
+                const li = document.createElement('li');
+                li.className = 'song-item';
+                
+                // Format the display name (remove .mp3 and underscores)
+                const displayName = songFile.replace('.mp3', '').replace(/_/g, ' ');
 
-            // Update the player and text
-            audioPlayer.src = selectedSong;
-            nowPlayingText.innerText = `Playing: ${selectedSong.replace('.mp3', '')}`;
+                li.innerHTML = `<span class="song-icon">▶</span> ${displayName}`;
+                
+                // Click to play manually
+                li.onclick = () => playSong(songFile, displayName, li);
+                
+                songListContainer.appendChild(li);
+            });
+        }
+
+        function playSong(file, displayName, listItem) {
+            // Remove highlight from previous playing song
+            if (currentPlayingItem) {
+                currentPlayingItem.classList.remove('playing');
+            }
             
-            // Play the song
+            // Highlight the clicked song
+            listItem.classList.add('playing');
+            currentPlayingItem = listItem;
+
+            // Update player and text
+            audioPlayer.src = file;
+            nowPlayingText.innerText = `PLAYING: ${displayName.toUpperCase()}`;
+            
+            // Play
             audioPlayer.play();
         }
     </script>
